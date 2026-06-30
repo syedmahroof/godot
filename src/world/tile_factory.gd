@@ -4,7 +4,7 @@ class_name TileFactory
 
 const TILE := 16
 
-static func make_solid_tileset() -> TileSet:
+static func make_solid_tileset(theme: Dictionary = {}) -> TileSet:
 	var ts := TileSet.new()
 	ts.tile_size = Vector2i(TILE, TILE)
 	ts.add_physics_layer()
@@ -12,7 +12,7 @@ static func make_solid_tileset() -> TileSet:
 	ts.set_physics_layer_collision_mask(0, 0)
 
 	var source := TileSetAtlasSource.new()
-	source.texture = _make_texture()
+	source.texture = _make_texture(theme.get("tile", Color(0.22, 0.50, 0.34)))
 	source.texture_region_size = Vector2i(TILE, TILE)
 	ts.add_source(source, 0)
 	source.create_tile(Vector2i.ZERO)
@@ -25,15 +25,19 @@ static func make_solid_tileset() -> TileSet:
 	]))
 	return ts
 
-static func _make_texture() -> ImageTexture:
+static func _make_texture(tint: Color) -> ImageTexture:
+	# A soft, slightly rounded-looking block tinted to the world's theme — a
+	# brighter lip on top and a darker base give it a modern, lit feel.
 	var img := Image.create(TILE, TILE, false, Image.FORMAT_RGBA8)
-	var base := Color(0.18, 0.20, 0.28)
-	var top := Color(0.30, 0.34, 0.46)
+	var base := tint.darkened(0.25)
+	var top := tint.lightened(0.18)
 	img.fill(base)
 	for x in TILE:
-		img.set_pixel(x, 0, top)
-		img.set_pixel(x, 1, top.darkened(0.12))
+		img.set_pixel(x, 0, top.lightened(0.1))
+		img.set_pixel(x, 1, top)
+		img.set_pixel(x, 2, tint)
 	for y in TILE:
-		img.set_pixel(0, y, base.lightened(0.06))
-		img.set_pixel(TILE - 1, y, base.darkened(0.22))
+		img.set_pixel(0, y, base.lightened(0.10))
+		img.set_pixel(TILE - 1, y, base.darkened(0.25))
+		img.set_pixel(y, TILE - 1, base.darkened(0.30) if y < TILE else base)
 	return ImageTexture.create_from_image(img)

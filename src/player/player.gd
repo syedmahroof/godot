@@ -78,8 +78,21 @@ func die() -> void:
 	if dead:
 		return
 	dead = true
+	Burst.spawn(get_parent(), global_position, Color(1.0, 0.5, 0.45), 18, 130.0, 0.55, 2.4)
+	Audio.play("die")
 	died.emit()
 	Game.player_died()
+
+## Launch upward (springs, stomps). Refreshes air abilities so chaining feels good.
+func bounce(v: float) -> void:
+	velocity.y = -absf(v) * gravity_sign
+	_can_double = true
+	_can_dash = true
+	_coyote = 0.0
+	_buffer = 0.0
+	jumped.emit()
+	if skin:
+		skin.squash(Vector2(0.6, 1.4))
 
 # --- Trap hooks ---
 
@@ -187,6 +200,9 @@ func _physics_process(delta: float) -> void:
 		landed.emit(strength)
 		if skin:
 			skin.squash(Vector2(1.0 + 0.3 * strength, 1.0 - 0.3 * strength))
+		if strength > 0.25:
+			Burst.spawn(get_parent(), global_position + Vector2(0, 7 * gravity_sign),
+				Color(0.9, 0.92, 1.0, 0.7), int(2 + strength * 6), 40.0 + strength * 50.0, 0.35, 1.6)
 	_was_on_floor = is_on_floor()
 
 func _jump(v: float) -> void:
@@ -194,6 +210,7 @@ func _jump(v: float) -> void:
 	_coyote = 0.0
 	_buffer = 0.0
 	jumped.emit()
+	Audio.play("jump", 0.06)
 	if skin:
 		skin.squash(Vector2(0.7, 1.3))
 
@@ -204,6 +221,7 @@ func _wall_jump(n: Vector2) -> void:
 	_buffer = 0.0
 	facing = int(signf(n.x))
 	jumped.emit()
+	Audio.play("jump", 0.06)
 	if skin:
 		skin.squash(Vector2(0.7, 1.3))
 
@@ -219,5 +237,7 @@ func _try_dash(input_x: float) -> void:
 	_can_dash = false
 	velocity = _dash_dir * DASH_SPEED
 	dashed.emit()
+	Audio.play("dash", 0.04)
+	Burst.spawn(get_parent(), global_position, Color(0.45, 0.85, 1.0, 0.9), 10, 60.0, 0.35, 2.0)
 	if skin:
 		skin.squash(Vector2(1.3, 0.7))

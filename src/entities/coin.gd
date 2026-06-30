@@ -19,10 +19,14 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(b: Node) -> void:
 	if b is Player:
+		Burst.spawn(get_parent(), global_position, Color(1.0, 0.86, 0.3), 7, 70.0, 0.4, 1.6)
+		Audio.play("coin", 0.12)
 		Game.add_coin()
 		queue_free()
 
 func _draw() -> void:
 	var off := sin(_t * 4.0) * 1.5
+	var glow := 0.5 + 0.5 * sin(_t * 5.0)
+	draw_circle(Vector2(0, off), 7.0, Color(1.0, 0.86, 0.3, 0.14 * glow))
 	draw_circle(Vector2(0, off), 4.0, Color(1.0, 0.84, 0.2))
 	draw_circle(Vector2(0, off), 2.0, Color(1.0, 0.95, 0.6))
