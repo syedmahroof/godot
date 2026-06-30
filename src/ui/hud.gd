@@ -16,6 +16,15 @@ var _toast_t := 0.0
 var _badge_t := 0.0
 var _flash_t := 0.0
 
+# Mobile controls
+var _mobile_mode := false
+var _btn_left: TouchScreenButton
+var _btn_right: TouchScreenButton
+var _btn_jump: TouchScreenButton
+var _btn_dash: TouchScreenButton
+var _btn_shoot: TouchScreenButton
+var _btn_pause: TouchScreenButton
+
 func _ready() -> void:
 	layer = 10
 
@@ -54,6 +63,10 @@ func _ready() -> void:
 	_badge = _make(Vector2(0, 96), HORIZONTAL_ALIGNMENT_CENTER, Color(1.0, 0.86, 0.35))
 	_badge.size = Vector2(320, 14)
 	_badge.add_theme_font_size_override("font_size", 9)
+
+	_mobile_mode = OS.has_feature("mobile") or DisplayServer.is_touchscreen_available()
+	if _mobile_mode:
+		_setup_mobile_controls()
 
 	Game.hud_changed.connect(_refresh)
 	Game.toast.connect(_show_toast)
@@ -110,6 +123,16 @@ func _refresh() -> void:
 	_level.text = label
 	_level.size = Vector2(312, 10)
 
+	if _mobile_mode:
+		if _btn_dash:
+			_btn_dash.visible = Game.dash_unlocked
+		if _btn_shoot:
+			var has_gun = false
+			var p = get_tree().get_first_node_in_group("player")
+			if p and p.has_gun:
+				has_gun = true
+			_btn_shoot.visible = has_gun
+
 func _show_toast(text: String) -> void:
 	_toast.text = text
 	_toast_t = 2.2
@@ -131,3 +154,62 @@ func _show_flash(color: Color) -> void:
 	_flash_dur = 0.4
 	_flash_t = _flash_dur
 	_flash.color = Color(color.r, color.g, color.b, color.a)
+
+# --- Mobile Touch Controls Implementation ---
+
+func _setup_mobile_controls() -> void:
+	_btn_left = _create_touch_button("move_left", Vector2(22, 148), 14, "◀")
+	_btn_right = _create_touch_button("move_right", Vector2(56, 148), 14, "▶")
+	_btn_jump = _create_touch_button("jump", Vector2(298, 148), 14, "▲")
+	_btn_dash = _create_touch_button("dash", Vector2(266, 152), 12, "⚡")
+	_btn_shoot = _create_touch_button("shoot", Vector2(298, 116), 12, "💥")
+	_btn_pause = _create_touch_button("pause", Vector2(306, 22), 10, "‖")
+
+	# Hide ability-dependent buttons initially
+	_btn_dash.visible = false
+	_btn_shoot.visible = false
+
+func _create_touch_button(action: String, pos: Vector2, radius: float, label_text: String) -> TouchScreenButton:
+	var btn := TouchScreenButton.new()
+	btn.action = action
+	
+	var normal_tex := _create_circle_texture(radius, Color(1.0, 1.0, 1.0, 0.15))
+	var pressed_tex := _create_circle_texture(radius, Color(1.0, 1.0, 1.0, 0.4))
+	btn.texture_normal = normal_tex
+	btn.texture_pressed = pressed_tex
+	btn.position = pos - Vector2(radius, radius)
+	
+	var shape := CircleShape2D.new()
+	shape.radius = radius
+	btn.shape = shape
+	
+	var lbl := Label.new()
+	lbl.text = label_text
+	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
+	lbl.size = Vector2(radius * 2, radius * 2)
+	lbl.add_theme_font_size_override("font_size", 8)
+	lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.8))
+	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
+	lbl.add_theme_constant_override("outline_size", 2)
+	btn.add_child(lbl)
+	
+	add_child(btn)
+	return btn
+
+func _create_circle_texture(radius: float, color: Color) -> ImageTexture:
+	var size = int(radius * 2)
+	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
+	for y in size:
+		for x in size:
+			var dx = x - radius + 0.5
+			var dy = y - radius + 0.5
+			var dist = sqrt(dx*dx + dy*dy)
+			if dist <= radius:
+				var alpha = color.a
+				if dist > radius - 1.5:
+					alpha *= (radius - dist) / 1.5
+				elif dist > radius - 2.5:
+					alpha = clampf(color.a * 2.0, 0.0, 1.0)
+				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
+	return ImageTexture.create_from_image(img)
