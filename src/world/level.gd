@@ -1,0 +1,89 @@
+class_name Level
+extends Node2D
+## Parses an ASCII grid (see levels.gd) into a tilemap + entities, then spawns
+## the player and a following camera. Self-contained: freeing the Level frees
+## everything in it, which is what makes the instant-respawn rebuild cheap.
+##
+## Legend:
+##   #  solid tile      P  player spawn    E  exit door
+##   C  coin            S  secret star     ^  spikes (hazard)
+##   K  checkpoint      X  crumbling platform
+
+var data: Dictionary = {}
+var spawn_point := Vector2.ZERO
+var player: Player
+var camera: GameCamera
+
+var _cols := 0
+var _rows := 0
+
+func _ready() -> void:
+	if not data.is_empty():
+		build()
+
+func build() -> void:
+	var grid: Array = data.get("grid", [])
+	_rows = grid.size()
+	_cols = 0
+	for line in grid:
+		_cols = maxi(_cols, line.length())
+
+	var t := TileFactory.TILE
+	var layer := TileMapLayer.new()
+	layer.tile_set = TileFactory.make_solid_tileset()
+	add_child(layer)
+
+	for row in _rows:
+		var line: String = grid[row]
+		for col in line.length():
+			var ch := line[col]
+			var center := Vector2(col * t + t / 2.0, row * t + t / 2.0)
+			match ch:
+				"#":
+					layer.set_cell(Vector2i(col, row), 0, Vector2i.ZERO)
+				"P":
+					spawn_point = center
+				"C":
+					_add(Coin.new(), center)
+				"S":
+					_add(Star.new(), center)
+				"^":
+					_add(Spike.new(), center)
+				"K":
+					_add(Checkpoint.new(), center)
+				"E":
+					_add(Exit.new(), center)
+				"X":
+					_add(Crumble.new(), center)
+
+	player = Player.new()
+	player.position = spawn_point
+	add_child(player)
+
+	camera = GameCamera.new()
+	camera.limit_left = 0
+	camera.limit_top = 0
+	camera.limit_right = _cols * t
+	camera.limit_bottom = _rows * t
+	player.add_child(camera)
+	camera.make_current()
+
+	player.landed.connect(_on_player_landed)
+	player.died.connect(_on_player_died)
+
+func _add(node: Node2D, pos: Vector2) -> void:
+	node.position = pos
+	add_child(node)
+
+func _on_player_landed(strength: float) -> void:
+	if strength > 0.6:
+		camera.shake(2.5)
+
+func _on_player_died() -> void:
+	camera.shake(6.0)
+
+func _physics_process(_delta: float) -> void:
+	# Falling out of the world is fatal.
+	if player and is_instance_valid(player) and not player.dead:
+		if player.global_position.y > (_rows + 3) * TileFactory.TILE:
+			player.die()
