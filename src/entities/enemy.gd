@@ -17,6 +17,7 @@ var _blink := 0.0
 func _ready() -> void:
 	collision_layer = 0
 	collision_mask = 2
+	add_to_group("enemy")
 	var s := CollisionShape2D.new()
 	var c := CapsuleShape2D.new()
 	c.radius = 6.0
@@ -49,8 +50,14 @@ func _on_body_entered(b: Node) -> void:
 		p.die()
 
 func _pop(p: Player) -> void:
-	_dead = true
 	p.bounce(STOMP_BOUNCE)
+	hit()
+
+## Kill it (stomp or bullet).
+func hit() -> void:
+	if _dead:
+		return
+	_dead = true
 	Audio.play("stomp", 0.08)
 	Burst.spawn(get_parent(), global_position, Color(0.95, 0.45, 0.55), 12, 95.0, 0.45)
 	queue_redraw()

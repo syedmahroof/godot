@@ -104,7 +104,11 @@ func _refresh() -> void:
 	_coins.text = "◎ %d" % Game.run_coins
 	_stats.text = "★ %d   ◆ %d   ☠ %d" % [Game.stars, Game.gems, Game.deaths]
 	var world := Game.current_world_name()
-	_level.text = "%s — %s" % [world, Game.current_level_name()] if world != "" else Game.current_level_name()
+	var label := "%s — %s" % [world, Game.current_level_name()] if world != "" else Game.current_level_name()
+	if Game.active_tool != "":
+		label += "    " + Game.active_tool
+	_level.text = label
+	_level.size = Vector2(312, 10)
 
 func _show_toast(text: String) -> void:
 	_toast.text = text

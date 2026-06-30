@@ -90,6 +90,22 @@ func build() -> void:
 					_add(fb, center)
 				"?":
 					_add(FakeExit.new(), center)
+				"~":
+					var w := Water.new()
+					w.tint = theme.get("accent", Color(0.25, 0.55, 0.9))
+					_add(w, center)
+				"L":
+					_add(Hazard.new(), center)
+				"M":
+					var fl := Flyer.new()
+					fl.tint = theme.get("accent", Color(0.95, 0.4, 0.5))
+					_add(fl, center)
+				"J":
+					_add(JetpackPickup.new(), center)
+				"U":
+					_add(GunPickup.new(), center)
+				"H":
+					_add(HelmetPickup.new(), center)
 
 	player = Player.new()
 	player.position = spawn_point

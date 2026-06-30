@@ -21,6 +21,15 @@ func _draw() -> void:
 	var dashing := p != null and p._dash_time > 0.0
 	draw_avatar(self, Avatars.get_avatar(Game.avatar_index), facing, dashing)
 
+	# Tool overlays so the held gear reads at a glance.
+	if p:
+		if p.shielded:
+			draw_arc(Vector2(0, -5), 9.0, PI, TAU, 16, Color(0.6, 0.9, 1.0, 0.9), 1.5)
+		if p.has_jetpack:
+			draw_rect(Rect2(-7.5, -3, 2.5, 9), Color(0.85, 0.5, 0.3))
+		if p.has_gun:
+			draw_line(Vector2(3.0 * facing, 0), Vector2(9.0 * facing, 0), Color(0.2, 0.2, 0.28), 2.0)
+
 ## Draws an avatar centred on the canvas origin. Shared by the player and the
 ## avatar-select preview. `dashing` swaps the body to the avatar's dash colour.
 static func draw_avatar(c: CanvasItem, av: Dictionary, facing := 1, dashing := false) -> void:

@@ -28,6 +28,7 @@ var time := 0.0
 var playing := false
 var combo := 0                           # consecutive quick coin grabs
 var combo_timer := 0.0
+var active_tool := ""                     # HUD hint for the currently-held tool
 var _deaths_at_level_start := 0
 
 # --- Persistent profile (mirrored to user://save.json) ---
@@ -100,6 +101,15 @@ func current_world_name() -> String:
 
 func current_theme() -> Dictionary:
 	return _levels[_level_index].get("theme", {})
+
+## Per-level gravity multiplier (e.g. low-gravity space levels). Defaults to 1.
+func level_gravity() -> float:
+	return _levels[_level_index].get("gravity", 1.0)
+
+## Update the HUD's held-tool hint (set by pickups; cleared each level).
+func set_tool(name: String) -> void:
+	active_tool = name
+	hud_changed.emit()
 
 func level(index: int) -> Dictionary:
 	return _levels[clampi(index, 0, _levels.size() - 1)]
@@ -177,6 +187,7 @@ func load_level(index: int) -> void:
 	_coins_at_cp = 0
 	time = 0.0
 	combo = 0
+	active_tool = ""
 	_deaths_at_level_start = deaths
 	_apply_unlock(_level_index)
 	_build(false)
@@ -188,6 +199,7 @@ func reload_level() -> void:
 	# Fast respawn: rebuild the room, drop the player at the last checkpoint,
 	# and roll coins back to the checkpoint snapshot.
 	run_coins = _coins_at_cp
+	active_tool = ""
 	playing = true
 	_build(true)
 	hud_changed.emit()
@@ -489,6 +501,7 @@ func _setup_input() -> void:
 	_bind("move_down", [KEY_DOWN, KEY_S])
 	_bind("jump", [KEY_SPACE, KEY_Z, KEY_K], [JOY_BUTTON_A])
 	_bind("dash", [KEY_SHIFT, KEY_X, KEY_L], [JOY_BUTTON_X])
+	_bind("shoot", [KEY_F, KEY_J], [JOY_BUTTON_B])
 	_bind("interact", [KEY_E, KEY_ENTER], [JOY_BUTTON_Y])
 	_bind("restart", [KEY_R], [JOY_BUTTON_BACK])
 	_bind("pause", [KEY_ESCAPE], [JOY_BUTTON_START])
