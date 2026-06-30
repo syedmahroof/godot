@@ -113,7 +113,7 @@ func _physics_process(delta: float) -> void:
 		elif input_x < 0.0:
 			facing = -1
 
-	if Input.is_action_just_pressed("jump"):
+	if Input.is_action_just_pressed("jump") or Input.is_action_just_pressed("move_up"):
 		_buffer = JUMP_BUFFER
 	if Input.is_action_just_pressed("dash"):
 		_try_dash(input_x)
@@ -172,7 +172,10 @@ func _physics_process(delta: float) -> void:
 			_jump(DOUBLE_JUMP_VELOCITY)
 
 	# Variable jump height (cut when moving against gravity and Jump released).
-	if Input.is_action_just_released("jump") and velocity.y * gravity_sign < 0.0:
+	# Either Jump or Up can hold the rise; only cut once neither is held.
+	var jump_held := Input.is_action_pressed("jump") or Input.is_action_pressed("move_up")
+	var jump_released := Input.is_action_just_released("jump") or Input.is_action_just_released("move_up")
+	if jump_released and not jump_held and velocity.y * gravity_sign < 0.0:
 		velocity.y *= JUMP_CUT
 
 	var pre_fall := velocity.y
