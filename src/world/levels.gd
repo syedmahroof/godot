@@ -18,6 +18,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.78, 0.92, 0.82),
 				"tile": Color(0.34, 0.66, 0.42),
 				"accent": Color(1.0, 0.95, 0.6),
+				"tile_style": "meadow",
 			},
 			"levels": [
 				{
@@ -86,6 +87,21 @@ static func worlds() -> Array:
 						"################################",
 					],
 				},
+				{
+					"name": "Unfair Fields",
+					"grid": [
+						"                                ",
+						"    !         !                 ",
+						"                                ",
+						"            S            G      ",
+						"          #####        #####    ",
+						"                                ",
+						"  P         ~ ~          fff  E ",
+						"#####ff#######f#######ffffff####",
+						"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+						"################################",
+					],
+				},
 			],
 		},
 		{
@@ -95,6 +111,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.52, 0.30, 0.60),
 				"tile": Color(0.56, 0.34, 0.64),
 				"accent": Color(1.0, 0.60, 0.88),
+				"tile_style": "caverns",
 			},
 			"levels": [
 				{
@@ -161,6 +178,22 @@ static func worlds() -> Array:
 						"################################",
 					],
 				},
+				{
+					"name": "Trust Issues II",
+					"grid": [
+						"                                ",
+						"            !          !        ",
+						"                                ",
+						"          S         G           ",
+						"        ######    ######        ",
+						"                                ",
+						"                       fffff    ",
+						" P         v     v     fffff  E ",
+						"#####ff#######f#######ffff######",
+						"^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^",
+						"################################",
+					],
+				},
 			],
 		},
 		{
@@ -170,6 +203,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.10, 0.30, 0.34),
 				"tile": Color(0.20, 0.46, 0.52),
 				"accent": Color(0.40, 1.0, 0.90),
+				"tile_style": "lab",
 			},
 			"levels": [
 				{
@@ -233,6 +267,21 @@ static func worlds() -> Array:
 						"################################",
 					],
 				},
+				{
+					"name": "Gravity Glitch",
+					"grid": [
+						"                                ",
+						"   ###########ff#############   ",
+						"   C    @      v     G   @      ",
+						"                             L  ",
+						"          S                     ",
+						"        ######                  ",
+						"   C            C               ",
+						" P    @          v     v      E ",
+						"################################",
+						"################################",
+					],
+				},
 			],
 		},
 		{
@@ -242,6 +291,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.34, 0.07, 0.10),
 				"tile": Color(0.50, 0.18, 0.20),
 				"accent": Color(1.0, 0.40, 0.32),
+				"tile_style": "caverns",
 			},
 			"levels": [
 				{
@@ -294,6 +344,23 @@ static func worlds() -> Array:
 						"################################",
 					],
 				},
+				{
+					"name": "The Rage Room",
+					"grid": [
+						"                                ",
+						"    !    !    !    !    !    !  ",
+						"                                ",
+						"         S         G            ",
+						"       ######    ######         ",
+						"                                ",
+						" P   v    v    v    v    v    ? ",
+						"###ff###f####ff##f###ff###f#####",
+						"^^^^^^^^^^^^^^^^^^ff^^^^^^^^^^^^",
+						"##################ff############",
+						"                  ff         E  ",
+						"################################",
+					],
+				},
 			],
 		},
 		{
@@ -303,6 +370,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.62, 0.80, 0.55),
 				"tile": Color(0.36, 0.55, 0.30),
 				"accent": Color(1.0, 0.85, 0.35),
+				"tile_style": "forest",
 			},
 			"levels": [
 				{
@@ -388,6 +456,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.96, 0.85, 0.55),
 				"tile": Color(0.80, 0.60, 0.30),
 				"accent": Color(0.55, 0.40, 0.65),
+				"tile_style": "dunes",
 			},
 			"levels": [
 				{
@@ -474,6 +543,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.08, 0.35, 0.55),
 				"tile": Color(0.18, 0.40, 0.52),
 				"accent": Color(0.40, 0.85, 1.0),
+				"tile_style": "depths",
 			},
 			"levels": [
 				{
@@ -555,6 +625,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.20, 0.12, 0.14),
 				"tile": Color(0.34, 0.26, 0.24),
 				"accent": Color(1.0, 0.55, 0.30),
+				"tile_style": "caverns",
 			},
 			"levels": [
 				{
@@ -640,6 +711,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.10, 0.06, 0.22),
 				"tile": Color(0.40, 0.30, 0.50),
 				"accent": Color(0.60, 0.80, 1.0),
+				"tile_style": "lab",
 			},
 			"levels": [
 				{
@@ -726,6 +798,7 @@ static func worlds() -> Array:
 				"sky_bottom": Color(0.85, 0.92, 0.98),
 				"tile": Color(0.62, 0.78, 0.92),
 				"accent": Color(0.90, 0.97, 1.0),
+				"tile_style": "ice",
 			},
 			"levels": [
 				{
