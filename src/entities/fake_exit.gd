@@ -1,6 +1,7 @@
-class_name Exit
+class_name FakeExit
 extends Area2D
-## Reaching this completes the level.
+## An exit door that is a filthy lie. Looks just like the real thing; touch it and
+## it cackles and kills you instead of finishing the level.
 
 var _t := 0.0
 
@@ -21,11 +22,12 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(b: Node) -> void:
 	if b is Player:
-		Burst.spawn(get_parent(), global_position + Vector2(0, -6), Color(0.85, 0.75, 1.0), 20, 120.0, 0.7, 2.4)
-		Audio.play("complete")
-		Game.complete_level()
+		Game.toast.emit("Ha! Wrong door.")
+		Burst.spawn(get_parent(), global_position + Vector2(0, -6), Color(0.95, 0.3, 0.3), 16, 120.0, 0.5, 2.2)
+		b.die()
 
 func _draw() -> void:
+	# Identical to the real Exit on purpose.
 	draw_rect(Rect2(-8, -22, 16, 30), Color(0.32, 0.22, 0.42), true)
 	draw_rect(Rect2(-6, -19, 12, 27), Color(0.6, 0.5, 0.85), true)
 	var glow := 0.5 + 0.5 * sin(_t * 3.0)

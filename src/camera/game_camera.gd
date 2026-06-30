@@ -10,6 +10,8 @@ func _ready() -> void:
 	ignore_rotation = true
 
 func shake(amount: float) -> void:
+	if not Game.screen_shake:
+		return
 	_shake = maxf(_shake, amount)
 
 func _process(delta: float) -> void:

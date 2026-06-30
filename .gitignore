@@ -11,3 +11,5 @@ export_presets.cfg
 # Build output
 build/
 *.zip
+*.keystore
+

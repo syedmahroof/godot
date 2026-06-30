@@ -16,6 +16,7 @@ func _ready() -> void:
 func _on_body_entered(b: Node) -> void:
 	if b is Player and not active:
 		active = true
+		Audio.play("checkpoint")
 		Game.set_checkpoint(global_position)
 		queue_redraw()
 

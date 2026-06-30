@@ -20,6 +20,8 @@ func _process(delta: float) -> void:
 
 func _on_body_entered(b: Node) -> void:
 	if b is Player:
+		Burst.spawn(get_parent(), global_position, Color(0.5, 0.92, 1.0), 14, 100.0, 0.6, 2.2)
+		Audio.play("star")
 		Game.add_star()
 		queue_free()
 

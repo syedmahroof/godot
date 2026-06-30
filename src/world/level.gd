@@ -28,9 +28,16 @@ func build() -> void:
 	for line in grid:
 		_cols = maxi(_cols, line.length())
 
+	var theme: Dictionary = data.get("theme", {})
+
+	# Themed parallax sky behind everything.
+	var bg := ThemeBackground.new()
+	bg.theme = theme
+	add_child(bg)
+
 	var t := TileFactory.TILE
 	var layer := TileMapLayer.new()
-	layer.tile_set = TileFactory.make_solid_tileset()
+	layer.tile_set = TileFactory.make_solid_tileset(theme)
 	add_child(layer)
 
 	for row in _rows:
@@ -55,6 +62,50 @@ func build() -> void:
 					_add(Exit.new(), center)
 				"X":
 					_add(Crumble.new(), center)
+				"O":
+					_add(Spring.new(), center)
+				"G":
+					_add(Gem.new(), center)
+				"B":
+					_add(Enemy.new(), center)
+				"@":
+					_add(GravPortal.new(), center)
+				"-":
+					var hp := MovingPlatform.new()
+					hp.axis = Vector2.RIGHT
+					_add(hp, center)
+				"|":
+					var vp := MovingPlatform.new()
+					vp.axis = Vector2.DOWN
+					_add(vp, center)
+				"v":
+					_add(TrapSpike.new(), center)
+				"f":
+					var ff := FakeFloor.new()
+					ff.color = theme.get("tile", Color(0.5, 0.2, 0.2))
+					_add(ff, center)
+				"!":
+					var fb := FallingBlock.new()
+					fb.color = theme.get("tile", Color(0.5, 0.2, 0.2))
+					_add(fb, center)
+				"?":
+					_add(FakeExit.new(), center)
+				"~":
+					var w := Water.new()
+					w.tint = theme.get("accent", Color(0.25, 0.55, 0.9))
+					_add(w, center)
+				"L":
+					_add(Hazard.new(), center)
+				"M":
+					var fl := Flyer.new()
+					fl.tint = theme.get("accent", Color(0.95, 0.4, 0.5))
+					_add(fl, center)
+				"J":
+					_add(JetpackPickup.new(), center)
+				"U":
+					_add(GunPickup.new(), center)
+				"H":
+					_add(HelmetPickup.new(), center)
 
 	player = Player.new()
 	player.position = spawn_point
