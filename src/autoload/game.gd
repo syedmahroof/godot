@@ -47,6 +47,9 @@ var badges_earned := {}                  # badge id -> true
 var screen_shake := true
 var fullscreen := false
 var sfx_volume := 0.7                     # 0.0 = muted
+var touch_controls_hidden := false        # hide the on-screen mobile buttons
+
+signal touch_controls_changed(hidden: bool)
 
 # --- Ability unlocks (granted as levels are reached) ---
 var double_jump_unlocked := false
@@ -316,10 +319,11 @@ func _badge_condition(id: String) -> bool:
 		"first_clear": return completed.size() >= 1
 		"halfway": return max_level >= int(level_count() / 2)
 		"rock_bottom": return completed.size() >= level_count()
-		"w1": return _world_cleared(0)
-		"w2": return _world_cleared(1)
-		"w3": return _world_cleared(2)
-		"w4": return _world_cleared(3)
+		"w1": return _world_cleared_named("Jelly Meadows")
+		"w_india": return _world_cleared_named("Incredible India")
+		"w2": return _world_cleared_named("Bubblegum Caverns")
+		"w3": return _world_cleared_named("Gravity Lab")
+		"w4": return _world_cleared_named("Devil's Playground")
 		"stars5": return stars >= 5
 		"starsall": return stars >= level_count()
 		"gems4": return gems >= 4
@@ -336,6 +340,17 @@ func _world_cleared(wi: int) -> bool:
 	var any := false
 	for e in _levels:
 		if e.get("world", -1) == wi:
+			any = true
+			if not completed.get(e.get("flat_index", -1), false):
+				return false
+	return any
+
+## Same as _world_cleared but keyed by world name, so badge mappings survive
+## worlds being inserted or reordered.
+func _world_cleared_named(wname: String) -> bool:
+	var any := false
+	for e in _levels:
+		if String(e.get("world_name", "")) == wname:
 			any = true
 			if not completed.get(e.get("flat_index", -1), false):
 				return false
@@ -428,6 +443,11 @@ func set_sfx_volume(v: float) -> void:
 	sfx_volume = clampf(v, 0.0, 1.0)
 	_save()
 	Audio.play("select")
+
+func set_touch_controls_hidden(hidden: bool) -> void:
+	touch_controls_hidden = hidden
+	touch_controls_changed.emit(hidden)
+	_save()
 
 func _apply_fullscreen() -> void:
 	DisplayServer.window_set_mode(
@@ -540,6 +560,7 @@ func _save() -> void:
 		"screen_shake": screen_shake,
 		"fullscreen": fullscreen,
 		"sfx_volume": sfx_volume,
+		"touch_controls_hidden": touch_controls_hidden,
 	}
 	var wf := FileAccess.open(SAVE_PATH, FileAccess.WRITE)
 	if wf:
@@ -575,6 +596,7 @@ func _load() -> void:
 	screen_shake = bool(d.get("screen_shake", true))
 	fullscreen = bool(d.get("fullscreen", false))
 	sfx_volume = float(d.get("sfx_volume", 0.7))
+	touch_controls_hidden = bool(d.get("touch_controls_hidden", false))
 
 # JSON object keys are always strings; these helpers keep our int-keyed dicts
 # round-tripping cleanly.

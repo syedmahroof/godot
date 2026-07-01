@@ -8,6 +8,7 @@ static func list() -> Array[Dictionary]:
 		{"id": "first_clear", "name": "Baby Steps", "desc": "Clear your first level"},
 		{"id": "halfway", "name": "Halfway Down", "desc": "Reach the midpoint"},
 		{"id": "w1", "name": "Meadow Master", "desc": "Clear Jelly Meadows"},
+		{"id": "w_india", "name": "Bharat Explorer", "desc": "Clear Incredible India"},
 		{"id": "w2", "name": "Cavern Conqueror", "desc": "Clear Bubblegum Caverns"},
 		{"id": "w3", "name": "Lab Legend", "desc": "Clear Gravity Lab"},
 		{"id": "w4", "name": "Devil Tamer", "desc": "Clear Devil's Playground"},

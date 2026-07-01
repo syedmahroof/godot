@@ -33,6 +33,7 @@ func build() -> void:
 	# Themed parallax sky behind everything.
 	var bg := ThemeBackground.new()
 	bg.theme = theme
+	bg.scene = String(data.get("bg_scene", ""))
 	add_child(bg)
 
 	var t := TileFactory.TILE
@@ -104,6 +105,46 @@ func build() -> void:
 					var sp := Spider.new()
 					sp.tint = theme.get("accent", Color(0.9, 0.2, 0.4))
 					_add(sp, center)
+				"=":
+					_add(Sawblade.new(), center)
+				"y":
+					_add(Pendulum.new(), center)
+				"x":
+					_add(Crusher.new(), center)
+				"j":
+					_add(FlameJet.new(), center)
+				"R":
+					var cg := Charger.new()
+					cg.tint = theme.get("accent", Color(1.0, 0.55, 0.3))
+					_add(cg, center)
+				"A":
+					_add(Armored.new(), center)
+				"T":
+					var tu := Turret.new()
+					tu.tint = theme.get("accent", Color(0.9, 0.4, 0.85))
+					_add(tu, center)
+				"W":
+					var db := DiveBomber.new()
+					db.tint = theme.get("accent", Color(0.72, 0.86, 1.0))
+					_add(db, center)
+				"m":
+					_add(Mimic.new(), center)
+				"g":
+					var gh := Ghost.new()
+					gh.tint = theme.get("accent", Color(0.72, 0.96, 0.76))
+					_add(gh, center)
+				"F":
+					var pf := Pufferfish.new()
+					pf.tint = theme.get("accent", Color(0.5, 0.9, 1.0))
+					_add(pf, center)
+				"Z":
+					var sz := Splitter.new()
+					sz.tint = theme.get("accent", Color(0.6, 0.95, 0.55))
+					_add(sz, center)
+				"Y":
+					var bo := Boss.new()
+					bo.tint = theme.get("accent", Color(1.0, 0.4, 0.4))
+					_add(bo, center)
 				"J":
 					_add(JetpackPickup.new(), center)
 				"U":

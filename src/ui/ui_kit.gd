@@ -56,7 +56,7 @@ static func make_label(text: String, size := 9, color := TEXT) -> Label:
 
 ## A styled menu button. Hover/focus share the accent fill so keyboard and mouse
 ## navigation read the same.
-static func make_button(text: String, width := 150, height := 16) -> Button:
+static func make_button(text: String, width := 150, height := 18) -> Button:
 	var b := Button.new()
 	b.text = text
 	b.custom_minimum_size = Vector2(width, height)
@@ -82,7 +82,7 @@ static func make_panel() -> PanelContainer:
 	p.add_theme_stylebox_override("panel", _box(PANEL, PANEL_EDGE, 4, 2))
 	return p
 
-static func _box(fill: Color, edge: Color, radius := 3, border := 1) -> StyleBoxFlat:
+static func _box(fill: Color, edge: Color, radius := 5, border := 1) -> StyleBoxFlat:
 	var s := StyleBoxFlat.new()
 	s.bg_color = fill
 	s.border_color = edge

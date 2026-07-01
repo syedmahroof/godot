@@ -24,6 +24,8 @@ var _btn_jump: TouchScreenButton
 var _btn_dash: TouchScreenButton
 var _btn_shoot: TouchScreenButton
 var _btn_pause: TouchScreenButton
+var _btn_toggle: TouchScreenButton       # always-visible show/hide switch
+var _controls_hidden := false
 
 func _ready() -> void:
 	layer = 10
@@ -124,14 +126,7 @@ func _refresh() -> void:
 	_level.size = Vector2(312, 10)
 
 	if _mobile_mode:
-		if _btn_dash:
-			_btn_dash.visible = Game.dash_unlocked
-		if _btn_shoot:
-			var has_gun = false
-			var p = get_tree().get_first_node_in_group("player")
-			if p and p.has_gun:
-				has_gun = true
-			_btn_shoot.visible = has_gun
+		_refresh_control_visibility()
 
 func _show_toast(text: String) -> void:
 	_toast.text = text
@@ -158,58 +153,111 @@ func _show_flash(color: Color) -> void:
 # --- Mobile Touch Controls Implementation ---
 
 func _setup_mobile_controls() -> void:
-	_btn_left = _create_touch_button("move_left", Vector2(22, 148), 14, "◀")
-	_btn_right = _create_touch_button("move_right", Vector2(56, 148), 14, "▶")
-	_btn_jump = _create_touch_button("jump", Vector2(298, 148), 14, "▲")
-	_btn_dash = _create_touch_button("dash", Vector2(266, 152), 12, "⚡")
-	_btn_shoot = _create_touch_button("shoot", Vector2(298, 116), 12, "💥")
-	_btn_pause = _create_touch_button("pause", Vector2(306, 22), 10, "‖")
+	# Bigger buttons, comfortably spaced. Movement on the left thumb, actions on
+	# the right. Hit areas are padded well beyond the visible disc (see below).
+	_btn_left = _create_touch_button("move_left", Vector2(30, 150), 18, "◀")
+	_btn_right = _create_touch_button("move_right", Vector2(74, 150), 18, "▶")
+	_btn_jump = _create_touch_button("jump", Vector2(292, 150), 20, "▲")
+	_btn_dash = _create_touch_button("dash", Vector2(246, 150), 15, "⚡")
+	_btn_shoot = _create_touch_button("shoot", Vector2(292, 106), 15, "✦")
+	_btn_pause = _create_touch_button("pause", Vector2(306, 22), 9, "‖")
 
-	# Hide ability-dependent buttons initially
-	_btn_dash.visible = false
-	_btn_shoot.visible = false
+	# Always-visible switch to hide/show the on-screen pad (bottom centre so it
+	# never sits under a thumb during play).
+	_btn_toggle = _create_touch_button("", Vector2(160, 171), 8, "☰")
+	_btn_toggle.pressed.connect(func():
+		Game.set_touch_controls_hidden(not Game.touch_controls_hidden))
 
+	Game.touch_controls_changed.connect(_apply_controls_hidden)
+	_controls_hidden = Game.touch_controls_hidden
+	_refresh_control_visibility()
+
+## Show/hide the pad (called by the toggle and when the setting changes).
+func _apply_controls_hidden(hidden: bool) -> void:
+	_controls_hidden = hidden
+	_refresh_control_visibility()
+
+## Reconcile every button's visibility with the hidden flag and ability unlocks.
+## The toggle switch itself always stays on screen so the pad can be recalled.
+func _refresh_control_visibility() -> void:
+	if not _mobile_mode:
+		return
+	var show := not _controls_hidden
+	if _btn_left: _btn_left.visible = show
+	if _btn_right: _btn_right.visible = show
+	if _btn_jump: _btn_jump.visible = show
+	if _btn_pause: _btn_pause.visible = show
+	if _btn_dash: _btn_dash.visible = show and Game.dash_unlocked
+	if _btn_shoot:
+		var has_gun := false
+		var p = get_tree().get_first_node_in_group("player")
+		if p and p.has_gun:
+			has_gun = true
+		_btn_shoot.visible = show and has_gun
+	if _btn_toggle:
+		_btn_toggle.visible = true
+		_btn_toggle.modulate.a = 0.9 if _controls_hidden else 0.55
+
+## A round touch button. The visible disc and label are centred child nodes and
+## the CircleShape2D hit area is centred on the same point and padded outward, so
+## the whole comfortable circle (not just the icon) responds to a tap.
 func _create_touch_button(action: String, pos: Vector2, radius: float, label_text: String) -> TouchScreenButton:
 	var btn := TouchScreenButton.new()
-	btn.action = action
-	
-	var normal_tex := _create_circle_texture(radius, Color(1.0, 1.0, 1.0, 0.15))
-	var pressed_tex := _create_circle_texture(radius, Color(1.0, 1.0, 1.0, 0.4))
-	btn.texture_normal = normal_tex
-	btn.texture_pressed = pressed_tex
-	btn.position = pos - Vector2(radius, radius)
-	
+	if action != "":
+		btn.action = action
+	btn.position = pos
+
 	var shape := CircleShape2D.new()
-	shape.radius = radius
+	shape.radius = radius + 8.0
 	btn.shape = shape
-	
+
+	var vis := Sprite2D.new()
+	vis.texture = _create_circle_texture(radius, Color(1.0, 1.0, 1.0, 0.16))
+	btn.add_child(vis)
+
 	var lbl := Label.new()
 	lbl.text = label_text
 	lbl.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl.vertical_alignment = VERTICAL_ALIGNMENT_CENTER
-	lbl.size = Vector2(radius * 2, radius * 2)
-	lbl.add_theme_font_size_override("font_size", 8)
-	lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.8))
+	lbl.size = Vector2(radius * 2.0, radius * 2.0)
+	lbl.position = Vector2(-radius, -radius)
+	lbl.add_theme_font_size_override("font_size", maxi(8, roundi(radius * 0.8)))
+	lbl.add_theme_color_override("font_color", Color(1.0, 1.0, 1.0, 0.85))
 	lbl.add_theme_color_override("font_outline_color", Color(0, 0, 0, 0.6))
 	lbl.add_theme_constant_override("outline_size", 2)
 	btn.add_child(lbl)
-	
+
+	# Smooth press feedback: brighten the disc and give a gentle pop.
+	btn.pressed.connect(func():
+		vis.modulate = Color(1.5, 1.5, 1.5, 1.0)
+		var tw := create_tween()
+		tw.tween_property(btn, "scale", Vector2(1.12, 1.12), 0.06))
+	btn.released.connect(func():
+		vis.modulate = Color(1, 1, 1, 1)
+		var tw := create_tween()
+		tw.set_trans(Tween.TRANS_BACK).set_ease(Tween.EASE_OUT)
+		tw.tween_property(btn, "scale", Vector2.ONE, 0.14))
+
 	add_child(btn)
 	return btn
 
+## A soft translucent disc with a slightly brighter rim, anti-aliased at the edge.
 func _create_circle_texture(radius: float, color: Color) -> ImageTexture:
-	var size = int(radius * 2)
+	var size := int(ceil(radius * 2.0))
 	var img := Image.create(size, size, false, Image.FORMAT_RGBA8)
 	for y in size:
 		for x in size:
-			var dx = x - radius + 0.5
-			var dy = y - radius + 0.5
-			var dist = sqrt(dx*dx + dy*dy)
-			if dist <= radius:
-				var alpha = color.a
-				if dist > radius - 1.5:
-					alpha *= (radius - dist) / 1.5
-				elif dist > radius - 2.5:
-					alpha = clampf(color.a * 2.0, 0.0, 1.0)
-				img.set_pixel(x, y, Color(color.r, color.g, color.b, alpha))
+			var dx := x - radius + 0.5
+			var dy := y - radius + 0.5
+			var dist := sqrt(dx * dx + dy * dy)
+			if dist > radius:
+				continue
+			var a := color.a
+			# Feather the outer edge for a smooth silhouette.
+			if dist > radius - 1.5:
+				a *= clampf((radius - dist) / 1.5, 0.0, 1.0)
+			# Brighter ring just inside the rim.
+			elif dist > radius - 2.8:
+				a = clampf(color.a * 2.6, 0.0, 1.0)
+			img.set_pixel(x, y, Color(color.r, color.g, color.b, a))
 	return ImageTexture.create_from_image(img)

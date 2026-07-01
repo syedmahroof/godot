@@ -13,19 +13,19 @@ func _ready() -> void:
 	add_child(particles)
 
 	var root := VBoxContainer.new()
-	root.add_theme_constant_override("separation", 2)
+	root.add_theme_constant_override("separation", 1)
 	root.alignment = BoxContainer.ALIGNMENT_CENTER
 	UIKit.center(root)
 	add_child(root)
 
-	root.add_child(UIKit.make_title("DAVE'S", 26))
-	var sub := UIKit.make_title("DEVILISH DESCENT", 11)
-	sub.add_theme_color_override("font_color", UIKit.ACCENT)
-	root.add_child(sub)
+	var title := UIKit.make_title("DAVE'S  DEVILISH DESCENT", 15)
+	root.add_child(title)
 
 	var stats := UIKit.make_label("★ %d    ◆ %d    ◎ %d    ☠ %d" % [Game.stars, Game.gems, Game.total_coins, Game.deaths], 8, UIKit.DIM)
 	root.add_child(stats)
-	root.add_child(_spacer(4))
+	var credit := UIKit.make_label("Proudly developed in Calicut, Kerala, India", 7, UIKit.GOLD)
+	root.add_child(credit)
+	root.add_child(_spacer(2))
 
 	var first: Button = null
 	if Game.has_progress():
@@ -39,14 +39,14 @@ func _ready() -> void:
 	_btn(root, "Options", Game.open_options)
 	_btn(root, "Quit", func(): get_tree().quit())
 
-	root.add_child(_spacer(2))
-	root.add_child(UIKit.make_label("Arrows / WASD to move  ·  Space to jump", 7, UIKit.DIM))
-
 	if first:
 		first.call_deferred("grab_focus")
 
 func _btn(parent: Node, text: String, cb: Callable) -> Button:
-	var b := UIKit.make_button(text, 150, 13)
+	# Slightly smaller font so all seven entries (incl. Continue) fit the 180px
+	# viewport without clipping.
+	var b := UIKit.make_button(text, 150, 12)
+	b.add_theme_font_size_override("font_size", 9)
 	b.pressed.connect(cb)
 	parent.add_child(b)
 	return b

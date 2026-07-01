@@ -7,6 +7,7 @@ extends CanvasLayer
 var _shake_btn: Button
 var _full_btn: Button
 var _sound_btn: Button
+var _touch_btn: Button
 var _reset_btn: Button
 var _confirm_reset := false
 
@@ -37,6 +38,11 @@ func _ready() -> void:
 	_sound_btn = _btn(root, "", func():
 		Game.set_sfx_volume(_next_sound())
 		_refresh())
+	# Only useful where an on-screen pad exists.
+	if DisplayServer.is_touchscreen_available() or OS.has_feature("mobile"):
+		_touch_btn = _btn(root, "", func():
+			Game.set_touch_controls_hidden(not Game.touch_controls_hidden)
+			_refresh())
 	root.add_child(_spacer(4))
 	_reset_btn = _btn(root, "", _on_reset)
 
@@ -57,6 +63,8 @@ func _refresh() -> void:
 	_shake_btn.text = "Screen Shake:  %s" % _onoff(Game.screen_shake)
 	_full_btn.text = "Fullscreen:  %s" % _onoff(Game.fullscreen)
 	_sound_btn.text = "Sound:  %s" % _SOUND_LABELS[_sound_index()]
+	if _touch_btn:
+		_touch_btn.text = "Touch Pad:  %s" % ("HIDDEN" if Game.touch_controls_hidden else "SHOWN")
 	_reset_btn.text = "Erase Save — Confirm?" if _confirm_reset else "Erase Save"
 	_reset_btn.add_theme_color_override("font_color", UIKit.DANGER if _confirm_reset else UIKit.TEXT)
 
