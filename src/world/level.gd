@@ -100,6 +100,10 @@ func build() -> void:
 					var fl := Flyer.new()
 					fl.tint = theme.get("accent", Color(0.95, 0.4, 0.5))
 					_add(fl, center)
+				"s":
+					var sp := Spider.new()
+					sp.tint = theme.get("accent", Color(0.9, 0.2, 0.4))
+					_add(sp, center)
 				"J":
 					_add(JetpackPickup.new(), center)
 				"U":

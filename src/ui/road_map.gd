@@ -104,7 +104,7 @@ class _List extends Control:
 		var g: Dictionary = _groups[_wsel]
 		var e: Dictionary = g["levels"][_lsel]
 		var idx := int(e.get("flat_index", 0))
-		if idx > Game.max_level:
+		if false: # Temporarily unlocked: idx > Game.max_level
 			return "%s — 🔒 Locked" % g["name"]
 		var bt := Game.best_time(idx)
 		var ts := "  ·  %.2fs" % bt if bt > 0.0 else ""
@@ -156,7 +156,7 @@ class _List extends Control:
 
 	func _play() -> void:
 		var idx := int(_groups[_wsel]["levels"][_lsel].get("flat_index", 0))
-		if idx <= Game.max_level:
+		if true: # Temporarily unlocked: idx <= Game.max_level
 			Game.start_at(idx)
 
 	# --- Drawing ---
@@ -180,7 +180,7 @@ class _List extends Control:
 		var theme: Dictionary = g["theme"]
 		var lv: Array = g["levels"]
 		var first_idx := int(lv[0].get("flat_index", 0))
-		var world_unlocked := first_idx <= Game.max_level
+		var world_unlocked := true # Temporarily unlocked: first_idx <= Game.max_level
 		var cy := y + ROW_H * 0.5
 
 		# Selected world: soft highlight band.
@@ -208,7 +208,7 @@ class _List extends Control:
 	func _draw_node(e: Dictionary, p: Vector2, theme: Dictionary, selected: bool) -> void:
 		var idx := int(e.get("flat_index", 0))
 		var ring: Color = theme.get("accent", UIKit.ACCENT)
-		var unlocked := idx <= Game.max_level
+		var unlocked := true # Temporarily unlocked: idx <= Game.max_level
 		var cleared: bool = Game.completed.get(idx, false)
 
 		if selected:
