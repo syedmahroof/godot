@@ -3600,6 +3600,83 @@ static func worlds() -> Array:
 				},
 			],
 		},
+		{
+			"name": "Jungle Ruins",
+			"theme": {
+				"sky_top": Color(0.16, 0.34, 0.18),
+				"sky_bottom": Color(0.44, 0.62, 0.30),
+				"tile": Color(0.40, 0.46, 0.24),
+				"accent": Color(1.0, 0.82, 0.30),
+				"boss_name": "Jungle Warlord",
+			},
+			"levels": [
+				{
+					"name": "Overgrown Steps",
+					"grid": [
+						"                                ",
+						"       M           M            ",
+						"    C     C     S     C    C    ",
+						"  ###   ####   ####   ###       ",
+						"     O          O               ",
+						"  P   s      F         s     E  ",
+						"################################",
+						"################################",
+					],
+				},
+				{
+					"name": "Vine Swing",
+					"grid": [
+						"        y         y             ",
+						"                                ",
+						"    C      C    S     C     C   ",
+						"  ###    ####      ####   ###   ",
+						"     O          O               ",
+						"  P   s      F        s      E  ",
+						"################################",
+						"################################",
+					],
+				},
+				{
+					"name": "Mud Pits",
+					"grid": [
+						"                                 ",
+						"      M           M              ",
+						"   C     C    S      C    C      ",
+						"  ###   ###        ###    ###    ",
+						"                                 ",
+						"  P   F     s     F     s   E    ",
+						"###uuu##uuuu##uuuu##uuuu##uu#####",
+						"################################ ",
+					],
+				},
+				{
+					"name": "Temple Traps",
+					"grid": [
+						"    y      y      y             ",
+						"      =           =             ",
+						"   C    F    C    s    C    S   ",
+						"  ###      ###      ###   ###   ",
+						"                                ",
+						" P   s  ^^   F    ^^   s    ^^ E",
+						"###uuu#####uuuu#####uuuu########",
+						"################################",
+					],
+				},
+				{
+					"name": "Throne of the Warlord",
+					"grid": [
+						"        y            y                      ",
+						"     M        =          M                  ",
+						"   C     s  U     C     F      C            ",
+						"  ###       ####        ####                ",
+						"     O          O                )          ",
+						"  P  s   ^^    F    ^^    s             ## E",
+						"###uuuu###uuuu###uuuu#######################",
+						"############################################",
+					],
+				},
+			],
+		},
 	]
 
 static func world_count() -> int:
