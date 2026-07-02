@@ -151,10 +151,153 @@ func build() -> void:
 					_add(GunPickup.new(), center)
 				"H":
 					_add(HelmetPickup.new(), center)
+				"d":
+					_add(Wisp.new(), center)
+				"b":
+					_add(Gloomhound.new(), center)
+				"c":
+					_add(MirrorShade.new(), center)
+				":":
+					_add(LightLance.new(), center)
+				"n":
+					_add(Shutter.new(), center)
+				"k":
+					var cr := CannonRobot.new()
+					cr.tint = theme.get("accent", Color(0.7, 0.82, 1.0))
+					_add(cr, center)
+				"o":
+					var dr := Drone.new()
+					dr.tint = theme.get("accent", Color(0.55, 1.0, 0.75))
+					_add(dr, center)
+				"*":
+					_add(Laser.new(), center)
+				"Q":
+					var aq := AlienQueen.new()
+					aq.tint = theme.get("accent", Color(0.6, 1.0, 0.7))
+					aq.boss_name = _boss_name(theme, "Alien Queen")
+					_add(aq, center)
+				"V":
+					var lp := LivingPlant.new()
+					lp.tint = theme.get("tile", Color(0.4, 0.8, 0.35))
+					_add(lp, center)
+				"D":
+					var mm := MoleMiner.new()
+					mm.tint = theme.get("tile", Color(0.7, 0.5, 0.32))
+					_add(mm, center)
+				"I":
+					var gs := GiantSpider.new()
+					gs.tint = theme.get("accent", Color(0.5, 0.42, 0.6))
+					_add(gs, center)
+				"N":
+					var fg := FrostGiant.new()
+					fg.tint = theme.get("accent", Color(0.75, 0.88, 1.0))
+					_add(fg, center)
+				"w":
+					var mg := MagmaGolem.new()
+					mg.tint = theme.get("accent", Color(1.0, 0.5, 0.2))
+					mg.boss_name = _boss_name(theme, "Magma Golem")
+					_add(mg, center)
+				"q":
+					var lv := Leviathan.new()
+					lv.tint = theme.get("accent", Color(0.3, 0.75, 0.95))
+					_add(lv, center)
+				"%":
+					# Slippery ice: a solid tile with a grip-cutting zone on top.
+					layer.set_cell(Vector2i(col, row), 0, Vector2i.ZERO)
+					var ip := IcePatch.new()
+					ip.tint = theme.get("accent", Color(0.75, 0.9, 1.0))
+					_add(ip, center)
+				"l":
+					var iw := IceWolf.new()
+					iw.tint = theme.get("accent", Color(0.7, 0.85, 1.0))
+					_add(iw, center)
+				"e":
+					var sn := Snowman.new()
+					sn.tint = theme.get("accent", Color(0.92, 0.96, 1.0))
+					_add(sn, center)
+				"i":
+					var fs := FrostSpirit.new()
+					fs.tint = theme.get("accent", Color(0.7, 0.92, 1.0))
+					_add(fs, center)
+				"a":
+					var sk := Skeleton.new()
+					sk.tint = theme.get("accent", Color(0.85, 0.86, 0.78))
+					_add(sk, center)
+				"p":
+					var cd := CursedDoll.new()
+					cd.tint = theme.get("accent", Color(0.85, 0.5, 0.6))
+					_add(cd, center)
+				"/":
+					_add(MovingWall.new(), center)
+				"(":
+					var hm := HauntedMirror.new()
+					hm.tint = theme.get("accent", Color(0.6, 0.95, 0.85))
+					_add(hm, center)
+				"r":
+					var pk := PhantomKing.new()
+					pk.tint = theme.get("accent", Color(0.6, 0.95, 0.85))
+					pk.boss_name = _boss_name(theme, "Phantom King")
+					_add(pk, center)
+				"t":
+					# Conveyor: a solid tile that drags the player rightward.
+					layer.set_cell(Vector2i(col, row), 0, Vector2i.ZERO)
+					var cv := Conveyor.new()
+					cv.tint = theme.get("tile", Color(0.5, 0.55, 0.62))
+					_add(cv, center)
+				"z":
+					var st := SteamTitan.new()
+					st.tint = theme.get("accent", Color(0.72, 0.76, 0.84))
+					st.boss_name = _boss_name(theme, "Steam Titan")
+					_add(st, center)
+				"u":
+					# Quicksand: a solid tile that drags and, if you linger, swallows you.
+					layer.set_cell(Vector2i(col, row), 0, Vector2i.ZERO)
+					var qs := QuicksandZone.new()
+					qs.tint = theme.get("tile", Color(0.78, 0.62, 0.34))
+					_add(qs, center)
+				"h":
+					var sg := SandGuardian.new()
+					sg.tint = theme.get("accent", Color(0.86, 0.68, 0.36))
+					sg.boss_name = _boss_name(theme, "Sand Guardian")
+					_add(sg, center)
+				"+":
+					var tc := ToxicCloud.new()
+					tc.tint = theme.get("accent", Color(0.55, 0.9, 0.35))
+					_add(tc, center)
+				")":
+					var mk := MushroomKing.new()
+					mk.tint = theme.get("accent", Color(0.7, 0.4, 0.85))
+					mk.boss_name = _boss_name(theme, "Mushroom King")
+					_add(mk, center)
+				";":
+					# Electric floor: a solid plate that periodically zaps whoever stands on it.
+					layer.set_cell(Vector2i(col, row), 0, Vector2i.ZERO)
+					var ef := ElectricFloor.new()
+					ef.tint = theme.get("accent", Color(0.5, 0.9, 1.0))
+					_add(ef, center)
+				",":
+					var mx := MutantX.new()
+					mx.tint = theme.get("accent", Color(0.6, 0.95, 0.35))
+					_add(mx, center)
+				".":
+					var ac := ArmoredConductor.new()
+					ac.tint = theme.get("accent", Color(0.7, 0.55, 0.45))
+					_add(ac, center)
+				"_":
+					var pc := PirateCaptain.new()
+					pc.tint = theme.get("accent", Color(0.85, 0.3, 0.3))
+					_add(pc, center)
 
 	player = Player.new()
 	player.position = spawn_point
 	add_child(player)
+
+	# Umbral Vault: a dark world dims everything; the player carries a lantern.
+	if String(theme.get("dark", "")) == "1":
+		var cm := CanvasModulate.new()
+		cm.color = Color(0.17, 0.16, 0.25)
+		add_child(cm)
+		player.enable_dark()
 
 	camera = GameCamera.new()
 	camera.limit_left = 0
@@ -166,6 +309,14 @@ func build() -> void:
 
 	player.landed.connect(_on_player_landed)
 	player.died.connect(_on_player_died)
+
+## Themed name for a reused boss: per-level "boss_name" wins, else the world theme's,
+## else the boss's own default.
+func _boss_name(theme: Dictionary, def: String) -> String:
+	var d := String(data.get("boss_name", ""))
+	if d != "":
+		return d
+	return String(theme.get("boss_name", def))
 
 func _add(node: Node2D, pos: Vector2) -> void:
 	node.position = pos

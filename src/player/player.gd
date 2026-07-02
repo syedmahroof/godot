@@ -51,6 +51,15 @@ var has_jetpack := false
 var has_gun := false
 var shielded := false             # helmet: absorbs one otherwise-fatal hit
 
+# Umbral Vault (dark world): the player carries an innate lantern. Enemies read
+# `light_r` to decide if they are lit. Hold "shoot" to widen the beam.
+const LIGHT_BASE := 34.0
+const LIGHT_WIDE := 80.0
+var dark := false                 # set by Level when the world theme is dark
+var light_r := LIGHT_BASE         # current light radius in px (enemies read this)
+var _blind_count := 0             # Shutter fog overlaps that blind the lantern
+var _light: PointLight2D
+
 var _coyote := 0.0
 var _buffer := 0.0
 var _can_double := true
@@ -61,6 +70,11 @@ var _wall_lock := 0.0
 var _was_on_floor := true
 var _reverse_count := 0
 var _water := 0                   # number of overlapping water tiles
+var _ice := 0                     # number of overlapping slippery-ice tiles
+var _belt_count := 0              # overlapping conveyor tiles
+var belt_vx := 0.0                # horizontal drift imposed by a conveyor
+var _sand := 0                    # overlapping quicksand tiles
+var _sand_time := 0.0             # how long we've been stuck in quicksand
 var _shoot_cd := 0.0
 var _invuln := 0.0                # brief mercy window after a shield save
 
@@ -94,8 +108,44 @@ func reset() -> void:
 	has_gun = false
 	shielded = false
 	_water = 0
+	_ice = 0
+	_belt_count = 0
+	belt_vx = 0.0
+	_sand = 0
+	_sand_time = 0.0
 	_shoot_cd = 0.0
 	_invuln = 0.0
+	light_r = LIGHT_BASE
+	_blind_count = 0
+
+func blinded() -> bool:
+	return _blind_count > 0
+
+func add_blind(n: int) -> void:
+	_blind_count = maxi(0, _blind_count + n)
+
+## Called by Level when the world is dark; grows the innate lantern light.
+func enable_dark() -> void:
+	dark = true
+	_light = PointLight2D.new()
+	_light.texture = _make_light_texture()
+	_light.color = Color(1.0, 0.94, 0.74)
+	_light.energy = 1.4
+	_light.z_index = 40
+	add_child(_light)
+
+func _make_light_texture() -> Texture2D:
+	var g := Gradient.new()
+	g.set_color(0, Color(1, 1, 1, 1))
+	g.set_color(1, Color(1, 1, 1, 0))
+	var gt := GradientTexture2D.new()
+	gt.gradient = g
+	gt.fill = GradientTexture2D.FILL_RADIAL
+	gt.fill_from = Vector2(0.5, 0.5)
+	gt.fill_to = Vector2(1.0, 0.5)
+	gt.width = 128
+	gt.height = 128
+	return gt
 
 func die() -> void:
 	if dead or _invuln > 0.0:
@@ -135,6 +185,21 @@ func grant_helmet() -> void:
 
 func add_water(n: int) -> void:
 	_water = maxi(0, _water + n)
+
+func add_ice(n: int) -> void:
+	_ice = maxi(0, _ice + n)
+
+func belt_enter(v: float) -> void:
+	_belt_count += 1
+	belt_vx = v
+
+func belt_exit() -> void:
+	_belt_count = maxi(0, _belt_count - 1)
+	if _belt_count == 0:
+		belt_vx = 0.0
+
+func add_sand(n: int) -> void:
+	_sand = maxi(0, _sand + n)
 
 func _equip_fx() -> void:
 	Audio.play("star")
@@ -187,6 +252,26 @@ func _physics_process(delta: float) -> void:
 	_invuln -= delta
 	_shoot_cd -= delta
 
+	# Dark-world lantern: widen while "shoot" is held (unless blinded by Shutter fog).
+	if dark:
+		var want := LIGHT_BASE
+		if blinded():
+			want = 12.0
+		elif not has_gun and Input.is_action_pressed("shoot"):
+			want = LIGHT_WIDE
+		light_r = move_toward(light_r, want, 260.0 * delta)
+		if _light:
+			_light.texture_scale = light_r / 48.0
+
+	# Quicksand: linger too long and you sink under. Keep moving/hop across it.
+	if _sand > 0:
+		_sand_time += delta
+		if _sand_time > 1.4:
+			die()
+			return
+	else:
+		_sand_time = 0.0
+
 	var input_x := Input.get_axis("move_left", "move_right")
 	if is_reversed():
 		input_x = -input_x
@@ -217,14 +302,26 @@ func _physics_process(delta: float) -> void:
 		_can_double = true
 		_can_dash = true
 
-	# Horizontal acceleration / friction.
+	# Horizontal acceleration / friction. Slippery ice cuts grip hard, so you keep
+	# sliding and have to plan stops early.
+	var on_ice := _ice > 0 and is_on_floor()
+	var belt := belt_vx if is_on_floor() else 0.0
 	var accel := GROUND_ACCEL if is_on_floor() else AIR_ACCEL
 	if _wall_lock > 0.0:
 		accel *= 0.3
+	if on_ice:
+		accel *= 0.4
+	if _sand > 0:
+		accel *= 0.5           # quicksand drags at your steps
 	if input_x != 0.0:
-		velocity.x = move_toward(velocity.x, input_x * RUN_SPEED, accel * delta)
+		# A conveyor shifts your target speed; you can still walk against it.
+		velocity.x = move_toward(velocity.x, belt + input_x * RUN_SPEED, accel * delta)
+	elif belt != 0.0:
+		velocity.x = move_toward(velocity.x, belt, accel * delta)
 	else:
 		var friction := GROUND_FRICTION if is_on_floor() else AIR_FRICTION
+		if on_ice:
+			friction *= 0.1
 		velocity.x = move_toward(velocity.x, 0.0, friction * delta)
 
 	# Gravity (direction follows gravity_sign; scaled by the level, e.g. low-grav
