@@ -24,6 +24,7 @@ var _btn_jump: TouchScreenButton
 var _btn_dash: TouchScreenButton
 var _btn_shoot: TouchScreenButton
 var _btn_pause: TouchScreenButton
+var _btn_restart: TouchScreenButton      # tap to restart the current level
 var _btn_toggle: TouchScreenButton       # always-visible show/hide switch
 var _controls_hidden := false
 
@@ -162,6 +163,10 @@ func _setup_mobile_controls() -> void:
 	_btn_shoot = _create_touch_button("shoot", Vector2(292, 106), 15, "✦")
 	_btn_pause = _create_touch_button("pause", Vector2(306, 22), 9, "‖")
 
+	# Tap to restart the current level (respawn at last checkpoint), tucked under pause.
+	_btn_restart = _create_touch_button("", Vector2(306, 44), 9, "⟳")
+	_btn_restart.pressed.connect(func(): Game.reload_level())
+
 	# Always-visible switch to hide/show the on-screen pad (bottom centre so it
 	# never sits under a thumb during play).
 	_btn_toggle = _create_touch_button("", Vector2(160, 171), 8, "☰")
@@ -187,6 +192,7 @@ func _refresh_control_visibility() -> void:
 	if _btn_right: _btn_right.visible = show
 	if _btn_jump: _btn_jump.visible = show
 	if _btn_pause: _btn_pause.visible = show
+	if _btn_restart: _btn_restart.visible = show
 	if _btn_dash: _btn_dash.visible = show and Game.dash_unlocked
 	if _btn_shoot:
 		var has_gun := false
